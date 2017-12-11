@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 
 import java.net.URI;
 
@@ -19,13 +20,16 @@ import java.net.URI;
 
 public class MainActivity extends AppCompatActivity {
 
+    EditText edt;
+    static final int LAUNCH_OTHER_ACTIVITY = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        edt = findViewById(R.id.edit);
         FloatingActionButton fab0 = (FloatingActionButton) findViewById(R.id.fab0);
         fab0.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Launch Intent", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                startOtherActivity();
+                startOtherActivityForResult();
             }
         });
     }
@@ -55,8 +59,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startOtherActivity(){
+        Intent intent = new Intent(this,OtherActivity.class);
+        // Paramètres à passer à OtherActivity
+        String message = edt.getText().toString();
+        intent.putExtra("text", message);
         Log.i("MainActivity","Launching Other Activity");
-        startActivity(new Intent(this,OtherActivity.class));
+        startActivity(intent);
+    }
+
+    public void startOtherActivityForResult(){
+        Intent intent = new Intent(this,OtherActivity.class);
+        // Paramètres à passer à OtherActivity
+        String message = edt.getText().toString();
+        intent.putExtra("text", message);
+        Log.i("MainActivity","Launching Other Activity");
+        startActivityForResult(intent, LAUNCH_OTHER_ACTIVITY);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        // Check which request we're responding to
+        if (requestCode == LAUNCH_OTHER_ACTIVITY) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                String message = intent.getStringExtra("text");
+                edt.setText(message);
+            }
+        }
     }
 
     @Override
